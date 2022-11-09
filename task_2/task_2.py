@@ -8,6 +8,7 @@ import numpy as np
 import evaluate
 import copy
 import matplotlib.pyplot as plt
+import os
 
 class NERDataMaker:
     """
@@ -151,13 +152,14 @@ def create_tweets_with_entities_list(train_df):
       annotated_tweet.append((train_df["WORD"][indx], train_df["LABEL"][indx])) 
   return annotated_tweets
 
-def task_2():    
-    data_df = pd.read_excel("twitter_dataset_train.xlsx")
+def task_2(n_samples, epochs, calling_dir = "."):    
+    data_df = pd.read_excel( os.path.join(calling_dir, "twitter_dataset_train.xlsx") )
 
     tweets_with_entities = create_tweets_with_entities_list(data_df)
     num_entries = len(tweets_with_entities)
-    train_tweets_with_entities = tweets_with_entities[:int(num_entries*0.15)]
-    eval_tweets_with_entities = tweets_with_entities[int(num_entries*0.15):int(num_entries*0.20)] 
+    tweets_with_entities = tweets_with_entities[:n_samples%num_entries]        
+    train_tweets_with_entities = tweets_with_entities[:int(n_samples*0.8)]
+    eval_tweets_with_entities = tweets_with_entities[int(n_samples*0.8):] 
     training_data = NERDataMaker( train_tweets_with_entities )
     eval_data = NERDataMaker( eval_tweets_with_entities )
 
@@ -172,13 +174,13 @@ def task_2():
                                                    id2label=training_data.id2label, 
                                                    label2id=training_data.label2id)
 
-    training_arguments = TrainingArguments(output_dir = "/content/drive/MyDrive/7mo semestre/IA_2/NER_models",
+    training_arguments = TrainingArguments(output_dir = os.path.join( calling_dir, "NER_models") ,
                                         evaluation_strategy="epoch",
                                         logging_strategy="epoch",
                                         learning_rate=2e-5,
                                         per_device_train_batch_size=16,
                                         per_device_eval_batch_size=16,                                      
-                                        num_train_epochs=30,
+                                        num_train_epochs=20,
                                         weight_decay=0.01)
 
     metric = evaluate.load("accuracy")
@@ -213,7 +215,10 @@ def task_2():
 
     plt.plot(list(zip(*training_metrics["loss"]))[1], label="loss")
     plt.plot(list(zip(*training_metrics["eval_loss"]))[1], label="val_loss")
+    plt.legend(loc='best')
     plt.show()    
 
 if __name__ == "__main__":
-    task_2()
+    N_EXAMPLES_TO_TRAIN = 100
+    epochs = 20
+    task_2(n_samples = N_EXAMPLES_TO_TRAIN, epochs=epochs)

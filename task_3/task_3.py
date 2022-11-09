@@ -1,11 +1,11 @@
 import requests
 import json
 from nltk.translate.bleu_score import sentence_bleu
-from api_keys import DEEPL_KEY
+import os
 
-def translate_to_english_using_deepl(string):
+def translate_to_english_using_deepl(string, api_key):
     domain_1 = 'https://api-free.deepl.com/v2/translate'
-    headers_1 = {'Authorization': 'DeepL-Auth-Key {k}'.format(k=DEEPL_KEY)}
+    headers_1 = {'Authorization': 'DeepL-Auth-Key {k}'.format(k=api_key)}
     data_1 = {"text":string, "target_lang":"EN"}
     response_1 = requests.post(domain_1, headers=headers_1, data=data_1)
     #print(response_1.json())
@@ -21,24 +21,27 @@ def translate_to_english_using_argostranslate(string):
     translation_2 = response_2.json()["translatedText"]
     return translation_2
 
-f_es = open("es-en/europarl-v7.es-en.es", "r")
-f_en = open("es-en/europarl-v7.es-en.en", "r")
+def task_3(api_key, calling_dir = "."):
+    f_es = open( os.path.join( calling_dir, "es-en/europarl-v7.es-en.es") , "r")
+    f_en = open( os.path.join( calling_dir, "es-en/europarl-v7.es-en.en") , "r")
 
-maximum_iter = 100
-i = 1
-deepl_blues = []
-argostranslate_blues = []
+    maximum_iter = 100
+    i = 1
+    deepl_blues = []
+    argostranslate_blues = []
 
-while i <= maximum_iter:
-    '''
-    spanish_sentence = f_es.readline()
-    english_reference = [f_en.readline()]
-    deepl_translation = translate_to_english_using_deepl(spanish_sentence)
-    argostranslate_translation = translate_to_english_using_argostranslate(spanish_sentence)
-    deepl_blues.append( sentence_bleu(english_reference, deepl_translation) )
-    argostranslate_blues.append( sentence_bleu(english_reference, argostranslate_translation) )
-    '''
-    i += 1
+    while i <= maximum_iter:    
+        spanish_sentence = f_es.readline()
+        english_reference = [f_en.readline()]
+        deepl_translation = translate_to_english_using_deepl(spanish_sentence, api_key)
+        argostranslate_translation = translate_to_english_using_argostranslate(spanish_sentence)
+        deepl_blues.append( sentence_bleu(english_reference, deepl_translation) )
+        argostranslate_blues.append( sentence_bleu(english_reference, argostranslate_translation) )    
+        i += 1
 
-#print("DEEPL_TRANSLATOR: {s}".format(s=sum(deepl_blues)/len(deepl_blues)))
-#print("ARGOSTRANSLATE_TRANSLATOR: {s}".format(s=sum(argostranslate_blues)/len(argostranslate_blues)))
+    print("DEEPL_TRANSLATOR: {s}".format(s=sum(deepl_blues)/len(deepl_blues)))
+    print("ARGOSTRANSLATE_TRANSLATOR: {s}".format(s=sum(argostranslate_blues)/len(argostranslate_blues)))
+
+if __name__ == "__main__":
+    from api_keys import DEEPL_KEY
+    task_3(api_key=DEEPL_KEY)
