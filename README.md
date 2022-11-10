@@ -17,26 +17,28 @@ and generate a token with permission to read models
 
 The output generated should be similar to the following:
 * for task 1:
+
 ![image](task_1_output.png)
+
 * for task 2:
+
 ![image](task_2_output.png)
+
 * for task 3:
+
 ![image](task_3_output.png)
 
 ### Installing
-* How should a user install? 
-* hint: using requirements.txt ;)
-
 * Clone the repository in your local machine
 * Open the command line interface (CLI) 
 * install the required libraries using ```pip install -r requirements.txt```
 * Ensure that you have a huggingface token with permission to read models
-* Get a DeepL translator API key
+* Get a DeepL translator API key at https://www.deepl.com/en/docs-api
 * Create a file called ```api_keys.py``` under the dir ```./task_3/```, the file should contain the following:
 ```
 DEEPL_KEY = <your_deepl_api_key_as_str>
+# (for gracemikaela@gmail.com a DeepL API key should be available as a canvas comment or file)
 ```
-(for gracemikaela@gmail.com an API key should be available as a canvas comment or file)
 * run the script using  ```python run.py```
 
 ### Tests: 
@@ -48,7 +50,7 @@ python -m pytest tests
 
 ## Authors
 
-Contributors names and contact info
+Contributors names and contact info:
 
 Jose Angel Del Angel Dominguez  
 [joseangeldelangel@gmail.com](mailto:joseangeldelangel@gmail.com)
