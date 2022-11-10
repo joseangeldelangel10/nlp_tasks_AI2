@@ -14,6 +14,8 @@ def task_1(calling_dir = "."):
     tokenizer = AutoTokenizer.from_pretrained("JamesH/autotrain-third-project-1883864250", use_auth_token=True)
     # We open the movie reviews file and ask the model to predict the sentiment of each movie review 
     movie_reviews_file = open( os.path.join(calling_dir, "tiny_movie_reviews_dataset.txt") , "r")
+    positive_reviews_count = 0
+    negative_reviews_count = 0
     for review in movie_reviews_file:
         inputs = tokenizer(review, return_tensors="pt")
         # Model output values are given in the format ([[[negative_review_probability, positive_review_probability]]])
@@ -24,7 +26,13 @@ def task_1(calling_dir = "."):
         redable_outputs = redable_outputs[0]
         negative_prob = redable_outputs[0][0].item()
         positive_prob = redable_outputs[0][1].item()
-        print("POSITIVE" if (positive_prob>=negative_prob) else "NEGATIVE")
+        review_sentiment = "POSITIVE" if (positive_prob>=negative_prob) else "NEGATIVE"
+        print( review_sentiment )
+        if review_sentiment == "POSITIVE":
+            positive_reviews_count += 1
+        else:
+            negative_reviews_count += 1
+    return (negative_reviews_count, positive_reviews_count)
 
 if __name__ == "__main__":
     task_1()

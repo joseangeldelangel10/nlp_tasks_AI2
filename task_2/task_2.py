@@ -175,6 +175,8 @@ def create_tweets_with_entities_list(train_df):
             annotated_tweet = []
         else:
             annotated_tweet.append((train_df["WORD"][indx], train_df["LABEL"][indx])) 
+    if len(annotated_tweet) > 0:
+        annotated_tweets.append( copy.deepcopy(annotated_tweet) )
     return annotated_tweets
 
 def task_2(n_samples, epochs, calling_dir = "."):
@@ -215,7 +217,7 @@ def task_2(n_samples, epochs, calling_dir = "."):
                                         learning_rate=2e-5,
                                         per_device_train_batch_size=16,
                                         per_device_eval_batch_size=16,                                      
-                                        num_train_epochs=20,
+                                        num_train_epochs=epochs,
                                         weight_decay=0.01)
     metric = evaluate.load("accuracy")
 

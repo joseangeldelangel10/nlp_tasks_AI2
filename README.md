@@ -43,10 +43,13 @@ DEEPL_KEY = <your_deepl_api_key_as_str>
 
 ### Tests: 
 
-To run tests, from the root dir of the repo, call: 
+To run tests, log in to huggingface cli using your huggingface token an then from the root dir of the repo, call: 
 ```
-python -m pytest tests
+python -m pytest tests.py
 ```
+You should get an output as the following:
+
+![tests_output](tests_output.png)
 
 ### Additional notes: 
 
