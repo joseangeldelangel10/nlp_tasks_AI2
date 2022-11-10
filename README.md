@@ -48,6 +48,13 @@ To run tests, from the root dir of the repo, call:
 python -m pytest tests
 ```
 
+### Additional notes: 
+
+The training loss / validation loss graph for the full dataset (after running for 40 epochs)
+is the following:
+
+![full_training_graph](task_2_full_training.png)
+
 ## Authors
 
 Contributors names and contact info:
