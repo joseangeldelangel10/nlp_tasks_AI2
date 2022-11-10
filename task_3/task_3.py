@@ -1,3 +1,16 @@
+'''
+This code will take the first 100 lines of the UN spanish transcriptions found
+on the 'europarl-v7.es-en.es' file, translate such lines using the deepl translation
+API and the argostranslate API, found on:
+
+- https://www.deepl.com/en/docs-api#:~:text=With%20the%20DeepL%20API%20Free,prioritized%20execution%20of%20translation%20requests. 
+- https://github.com/argosopentech/argos-translate
+
+Respectively.
+
+Then the translations from both APIs will be evaluated using the BLEU score using the 
+UN english translation of the spanish file 
+'''
 import requests
 import json
 from nltk.translate.bleu_score import sentence_bleu
@@ -7,8 +20,7 @@ def translate_to_english_using_deepl(string, api_key):
     domain_1 = 'https://api-free.deepl.com/v2/translate'
     headers_1 = {'Authorization': 'DeepL-Auth-Key {k}'.format(k=api_key)}
     data_1 = {"text":string, "target_lang":"EN"}
-    response_1 = requests.post(domain_1, headers=headers_1, data=data_1)
-    #print(response_1.json())
+    response_1 = requests.post(domain_1, headers=headers_1, data=data_1)    
     translation_1 = response_1.json()["translations"][0]["text"]
     return translation_1
 
@@ -16,8 +28,7 @@ def translate_to_english_using_argostranslate(string):
     domain_2 = 'https://translate.argosopentech.com/translate'
     headers_2 = { "Content-Type": "application/json" }
     data_2 = {"q":string, "source":"es", "target":"en"}
-    response_2 = requests.post(domain_2, headers=headers_2, data=json.dumps(data_2))
-    #print(response_2.json())
+    response_2 = requests.post(domain_2, headers=headers_2, data=json.dumps(data_2))    
     translation_2 = response_2.json()["translatedText"]
     return translation_2
 

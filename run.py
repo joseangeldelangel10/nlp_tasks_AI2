@@ -1,3 +1,9 @@
+'''
+This script calls three other scripts to:
+1 - Evaluate the sentiment of a set of movie reviews (POSITIVE, NEGATIVE)
+2 - Retrain a NER model using tagged tweets
+3 - Evaluate the perfomance of two translation APIs
+'''
 from task_1.task_1 import task_1 as t1
 from task_2.task_2 import task_2 as t2
 from task_3.task_3 import task_3 as t3

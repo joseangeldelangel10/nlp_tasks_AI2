@@ -1,5 +1,15 @@
-# "train" and "dev" are annotated with 10 fine-grained NER categories: person, geo-location, company, 
-# facility, product,music artist, movie, sports team, tv show and other.
+'''
+This code takes a pretrained NLP model for named entity recognition (NER), such model has been trained to
+recognize four types of entities: location (LOC), organizations (ORG), person (PER) and Miscellaneous (MISC)
+and will be retrained to recognize 10 types of entities 'geo-loc' 'facility' 'movie' 'company' 'product'
+'person' 'sportsteam' 'other' 'tvshow' 'musicartist', using a dataset with Tweets and its respective
+tags within the tweets ('twitter_dataset_dev.xlxs'). To see more about the dataset, the number of labels
+and other details you can check the data_analysis notebook on this same directory.
+
+The model used can be found on:
+
+https://huggingface.co/dslim/bert-base-NER?text=My+name+is+Sarah+and+I+live+in+London
+'''
 
 from datasets import Dataset, Features, Value, ClassLabel, Sequence
 from transformers import BertTokenizer, BertForTokenClassification, Trainer, TrainerCallback, TrainingArguments, BertConfig, DataCollatorForTokenClassification
@@ -13,16 +23,26 @@ import os
 class NERDataMaker:
     """
     class that is initialized with a list containing lists of tuples, 
-    each list contains tuples with word, tag pairs. 
+    each inner list contains tuples with word, tag pairs. 
     
-    Every list on the entry list corresponds to an entry on the tweets for NER dataset from 
-    'aritter' (ritter.1492@osu.edu)
+    Every list on the entry list corresponds to a tweet on the dataset from 
+    'aritter' (ritter.1492@osu.edu), found on:
+
+    https://github.com/aritter/twitter_nlp/tree/master/data/annotated/wnut16
 
     This class helps us to vectorize the labels and words of the given dataset, 
     the constructor method (__init__) vectorizes labels and leaves the id2label and label2id
-    properties ready. The as_hf_dataset method vectorizes the words on the given dataset and,
-    changes the dtype to a transformers.Dataset (huggingface native), adding the necessary 
-    items to the new huggingface dataset.
+    properties ready. 
+    
+    The as_hf_dataset method vectorizes the words on the given dataset and,
+    changes the dtype of the dataset to a transformers.Dataset (huggingface native), while 
+    adding the necessary items to the new huggingface dataset.
+
+    The rest of the methods are helper methods.
+
+    This class is based on the original class of Sanjaya Subedi, referenced on his
+    tutorial at: 
+    https://sanjayasubedi.com.np/deeplearning/training-ner-with-huggingface-transformer/
     """
     def __init__(self, tokens_with_entities_list):
         self.unique_entities = []
@@ -140,40 +160,55 @@ class NERDataMaker:
         return tokenized_ds
 
 def create_tweets_with_entities_list(train_df):
-  is_a_space = pd.isnull(train_df["WORD"])
-  annotated_tweets = []
-  annotated_tweet = []
-  for indx in train_df.index:
-    if is_a_space[indx]:
-      if len(annotated_tweet) > 0:
-        annotated_tweets.append( copy.deepcopy(annotated_tweet) )
-      annotated_tweet = []
-    else:
-      annotated_tweet.append((train_df["WORD"][indx], train_df["LABEL"][indx])) 
-  return annotated_tweets
+    '''
+    This function takes a dataframe with columns 'WORD' and 'LABEL' 
+    (the shape of our dataset) where every row containing NA represents
+    the end of a tweet
+    '''
+    is_a_space = pd.isnull(train_df["WORD"])
+    annotated_tweets = []
+    annotated_tweet = []
+    for indx in train_df.index:
+        if is_a_space[indx]:
+        if len(annotated_tweet) > 0:
+            annotated_tweets.append( copy.deepcopy(annotated_tweet) )
+        annotated_tweet = []
+        else:
+        annotated_tweet.append((train_df["WORD"][indx], train_df["LABEL"][indx])) 
+    return annotated_tweets
 
-def task_2(n_samples, epochs, calling_dir = "."):    
+def task_2(n_samples, epochs, calling_dir = "."):
+    '''
+    Main function for the task
+    '''    
+    # we read the dataset
     data_df = pd.read_excel( os.path.join(calling_dir, "twitter_dataset_train.xlsx") )
 
+    # we transform the each tweet to a list of word-label pairs
     tweets_with_entities = create_tweets_with_entities_list(data_df)
+
+    # we make the train validation split
     num_entries = len(tweets_with_entities)
     tweets_with_entities = tweets_with_entities[:n_samples%num_entries]        
     train_tweets_with_entities = tweets_with_entities[:int(n_samples*0.8)]
-    eval_tweets_with_entities = tweets_with_entities[int(n_samples*0.8):] 
+    eval_tweets_with_entities = tweets_with_entities[int(n_samples*0.8):]
+
+    # we transform the datset to a huggingface Dataset  
     training_data = NERDataMaker( train_tweets_with_entities )
     eval_data = NERDataMaker( eval_tweets_with_entities )
-
     tokenizer = BertTokenizer.from_pretrained("dslim/bert-base-NER")
     data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
     train_data_prepared_for_hf_training = training_data.as_hf_dataset(tokenizer=tokenizer)
     eval_data_prepared_for_hf_training = eval_data.as_hf_dataset(tokenizer=tokenizer)
 
+    # we import the pretrained model
     model = BertForTokenClassification.from_pretrained("dslim/bert-base-NER",
                                                    ignore_mismatched_sizes=True,                                                   
                                                    _num_labels=len(training_data.unique_entities),                                                    
                                                    id2label=training_data.id2label, 
                                                    label2id=training_data.label2id)
 
+    # we declare the training params
     training_arguments = TrainingArguments(output_dir = os.path.join( calling_dir, "NER_models") ,
                                         evaluation_strategy="epoch",
                                         logging_strategy="epoch",
@@ -182,7 +217,6 @@ def task_2(n_samples, epochs, calling_dir = "."):
                                         per_device_eval_batch_size=16,                                      
                                         num_train_epochs=20,
                                         weight_decay=0.01)
-
     metric = evaluate.load("accuracy")
 
     def compute_metrics(eval_pred):
@@ -194,6 +228,7 @@ def task_2(n_samples, epochs, calling_dir = "."):
         labels = np.reshape(labels, (labels.shape[0]*labels.shape[1],))          
         return metric.compute(predictions=predictions, references=labels)
 
+    # we retrain the model
     trainer = Trainer(model = model,
                   args = training_arguments,
                   train_dataset=train_data_prepared_for_hf_training,
@@ -202,7 +237,8 @@ def task_2(n_samples, epochs, calling_dir = "."):
                   compute_metrics = compute_metrics)
 
     trainer.train()
-    # formating training results for plotting
+
+    # we format the training results for plotting
     raw_history = trainer.state.log_history[:-1]
     training_metrics = {"eval_loss":[], "eval_accuracy": [], "loss":[]}
     current_epoch = 1.0
@@ -213,6 +249,7 @@ def task_2(n_samples, epochs, calling_dir = "."):
         for m in metrics_in_dict:
             training_metrics[m].append( (int(current_epoch),dictionary[m]) )
 
+    # we plot the training results
     plt.plot(list(zip(*training_metrics["loss"]))[1], label="loss")
     plt.plot(list(zip(*training_metrics["eval_loss"]))[1], label="val_loss")
     plt.legend(loc='best')
