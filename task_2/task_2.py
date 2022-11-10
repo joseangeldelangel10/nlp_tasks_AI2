@@ -170,11 +170,11 @@ def create_tweets_with_entities_list(train_df):
     annotated_tweet = []
     for indx in train_df.index:
         if is_a_space[indx]:
-        if len(annotated_tweet) > 0:
-            annotated_tweets.append( copy.deepcopy(annotated_tweet) )
-        annotated_tweet = []
+            if len(annotated_tweet) > 0:
+                annotated_tweets.append( copy.deepcopy(annotated_tweet) )
+            annotated_tweet = []
         else:
-        annotated_tweet.append((train_df["WORD"][indx], train_df["LABEL"][indx])) 
+            annotated_tweet.append((train_df["WORD"][indx], train_df["LABEL"][indx])) 
     return annotated_tweets
 
 def task_2(n_samples, epochs, calling_dir = "."):
