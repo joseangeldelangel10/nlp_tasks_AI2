@@ -52,12 +52,34 @@ You should get an output as the following:
 
 ![tests_output](tests_output.png)
 
-### Additional notes: 
+### Additional notes on Task 2: 
 
-The training loss / validation loss graph for the full twitter dataset (after running for 40 epochs)
-is the following:
+The training loss / validation loss graph when we use the labels found within the twitter dataset is the following:
 
 ![full_training_graph](task_2_full_training.png)
+
+On the Y axis we have the value of the losses and on the X axis we have the training epochs.
+
+We can see that when using the new labels, model quickly overfits, since validation loss gets stucked on a high value, while the training loss decreases. We can assume this is caused by the low volume of data and the huge number of trainable parameters we have.
+
+To solve this we adopted another aproach that would be useful if we wanted to retrain the model to improve on NER detection on tweets. On this aproach we remap the labels found on the twitter dataset the following way: 
+      "company"->"ORG",
+      "facility"->"O",
+      "geo-loc"->"LOC",
+      "movie"->"O",
+      "musicartist"->"O",
+      "other"->"O",
+      "person"->"PER",
+      "product"->"O",
+      "sportsteam"->"ORG",
+      "tvshow"->"O"
+If we retrain the model after doing this we have the following results:
+
+![full_training_graph](task_2_full_training_remaped.png)
+
+As we can se here the model was mostly ready to be used on tweets, since it had low values on the initial training and validation losses. 
+
+However, on the retraining the validation loss reduced a little bit during the first epochs, which led us to a model that is a somewhat better when detecting NER on tweets.
 
 ## Authors
 
