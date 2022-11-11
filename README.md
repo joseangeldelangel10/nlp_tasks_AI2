@@ -63,16 +63,16 @@ On the Y axis we have the value of the losses and on the X axis we have the trai
 We can see that when using the new labels, model quickly overfits, since validation loss gets stucked on a high value, while the training loss decreases. We can assume this is caused by the low volume of data and the huge number of trainable parameters we have.
 
 To solve this we adopted another aproach that would be useful if we wanted to retrain the model to improve on NER detection on tweets. On this aproach we remap the labels found on the twitter dataset the following way: 
-      "company"->"ORG",
-      "facility"->"O",
-      "geo-loc"->"LOC",
-      "movie"->"O",
-      "musicartist"->"O",
-      "other"->"O",
-      "person"->"PER",
-      "product"->"O",
-      "sportsteam"->"ORG",
-      "tvshow"->"O"
+* "company"->"ORG",
+* "facility"->"O",
+* "geo-loc"->"LOC",
+* "movie"->"O",
+* "musicartist"->"O",
+* "other"->"O",
+* "person"->"PER",
+* "product"->"O",
+* "sportsteam"->"ORG",
+* "tvshow"->"O"
 If we retrain the model after doing this we have the following results:
 
 ![full_training_graph](task_2_full_training_remaped.png)
