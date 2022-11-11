@@ -26,21 +26,22 @@ and generate a token with permission to read models
 DEEPL_KEY = <your_deepl_api_key_as_str>
 # (for gracemikaela@gmail.com a DeepL API key should be available as a canvas comment or file)
 ```
+7. Download the folder called ```es-en``` from [this link](https://drive.google.com/drive/folders/1RgcSeYg8Ah9PxF03XRLmOrpGd7DtiMZB?usp=sharing) and copy it under the ```./task_3/``` folder in your local copy of this repo. This file contains Spanish-English sentence pairs of a UN proceedings that will be used to evaluate tranlation APIs on task 3 
 7. run the main script using  ```python run.py```
 
 
 Once you run the script the output generated should be similar to the following:
 * for task 1:
 
-![image](task_1_output.png)
+![image](images_for_readme/task_1_output.png)
 
 * for task 2:
 
-![image](task_2_output.png)
+![image](images_for_readme/task_2_output.png)
 
 * for task 3:
 
-![image](task_3_output.png)
+![image](images_for_readme/task_3_output.png)
 
 ### Tests: 
 
@@ -50,13 +51,13 @@ python -m pytest tests.py
 ```
 You should get an output as the following:
 
-![tests_output](tests_output.png)
+![tests_output](images_for_readme/tests_output.png)
 
 ### Additional notes on Task 2: 
 
 The training loss / validation loss graph when we use the labels found within the whole twitter dataset is the following:
 
-![full_training_graph](task_2_full_training.png)
+![full_training_graph](images_for_readme/task_2_full_training.png)
 
 On the Y axis we have the value of the training and validation losses for the full dataset and on the X axis we have the epoch number.
 
@@ -65,20 +66,21 @@ We can see that when using these new labels, the model quickly overfits since va
 To solve this we adopted another aproach, which would be useful if we wanted to retrain the model to improve on detecting the same NERs but on tweets.
 
 On this aproach we remap the labels found on the twitter dataset the following way: 
-* "company"->"ORG",
-* "facility"->"O",
-* "geo-loc"->"LOC",
-* "movie"->"O",
-* "musicartist"->"O",
-* "other"->"O",
-* "person"->"PER",
-* "product"->"O",
-* "sportsteam"->"ORG",
+
+* "company"->"ORG"
+* "facility"->"O"
+* "geo-loc"->"LOC"
+* "movie"->"O"
+* "musicartist"->"O"
+* "other"->"O"
+* "person"->"PER"
+* "product"->"O"
+* "sportsteam"->"ORG"
 * "tvshow"->"O"
 
 If we retrain the model after doing this we have the following results:
 
-![full_training_graph](task_2_full_training_remaped.png)
+![full_training_graph](images_for_readme/task_2_full_training_remaped.png)
 
 As we can se the model was mostly ready to be used on tweets, since it had low values from the initial training and validation losses. 
 
