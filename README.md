@@ -12,7 +12,7 @@ The tasks required are:
 2. Retrain a NER model using a dataset with tagged tweets
 3. Evaluate the perfomance of two translation APIs using BLEU score
 
-To generate a huggingface token sign-in into huggingface, go to https://huggingface.co/settings/tokens
+Huggingface API is required to run the contents on this repo. To generate a huggingface token sign-in into huggingface, go to https://huggingface.co/settings/tokens
 and generate a token with permission to read models
 
 ### Installing and excecuting code 
@@ -75,6 +75,7 @@ On this aproach we remap the labels found on the twitter dataset the following w
 * "product"->"O",
 * "sportsteam"->"ORG",
 * "tvshow"->"O"
+
 If we retrain the model after doing this we have the following results:
 
 ![full_training_graph](task_2_full_training_remaped.png)
@@ -89,5 +90,7 @@ Contributors names and contact info:
 
 Jose Angel Del Angel Dominguez  
 [joseangeldelangel@gmail.com](mailto:joseangeldelangel@gmail.com)
-[website](joseangeldelangel.com)
+
+[website](http://joseangeldelangel.com/)
+
 [linkedin](https://www.linkedin.com/in/jos%C3%A9-%C3%A1ngel-del-%C3%A1ngel-6a9293175/)
