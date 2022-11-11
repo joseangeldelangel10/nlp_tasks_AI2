@@ -26,7 +26,7 @@ and generate a token with permission to read models
 DEEPL_KEY = <your_deepl_api_key_as_str>
 # (for gracemikaela@gmail.com a DeepL API key should be available as a canvas comment or file)
 ```
-7. Download the folder called ```es-en``` from [this link](https://drive.google.com/drive/folders/1RgcSeYg8Ah9PxF03XRLmOrpGd7DtiMZB?usp=sharing) and copy it under the ```./task_3/``` folder in your local copy of this repo. This file contains Spanish-English sentence pairs of a UN proceedings that will be used to evaluate tranlation APIs on task 3 
+7. Download the folder called ```es-en``` from [this link](https://drive.google.com/drive/folders/1RgcSeYg8Ah9PxF03XRLmOrpGd7DtiMZB?usp=sharing) and locate it under the ```./task_3/``` folder in your local copy of this repo. This file contains Spanish-English sentence pairs of UN proceedings that will be used to evaluate tranlation APIs on task 3 
 7. run the main script using  ```python run.py```
 
 
@@ -45,7 +45,7 @@ Once you run the script the output generated should be similar to the following:
 
 ### Tests: 
 
-To run the unit tests for the porject methods log in to huggingface cli using your huggingface token and then from the root dir of the repo, call: 
+To run the unit tests for the project log in to huggingface using cli and your huggingface token. Then from the root dir of the repo, call: 
 ```
 python -m pytest tests.py
 ```
