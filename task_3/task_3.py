@@ -11,10 +11,27 @@ Respectively.
 Then the translations from both APIs will be evaluated using the BLEU score using the 
 UN english translation of the spanish file 
 '''
+
+# One note on the tests you wrote: 
+# the testing in general looks really good -- you have done a great job!! 
+
+# it's better to split into more, smaller tests, so that each one tests a small piece
+# of functionality, and when one fails, you know exactly where the failure is. 
+# https://docs.python-guide.org/writing/tests/
+
+# Just FYI, if tests have similar setup, you can use pytest to define a pre-test setup that
+# you do for all/some tests just once, so you are not repeating work. 
+# but in this case it's fine to just repeat the setup steps in each unit test, if
+# that's easiest -- that's more advanced testing but wanted to send info in case you
+# want to learn. 
+# 
+
 import requests
 import json
 from nltk.translate.bleu_score import sentence_bleu
 import os
+
+N_LINES_TO_TRANSLATE=100
 
 def translate_to_english_using_deepl(string, api_key):
     domain_1 = 'https://api-free.deepl.com/v2/translate'
@@ -33,24 +50,25 @@ def translate_to_english_using_argostranslate(string):
     return translation_2
 
 def task_3(api_key, calling_dir = "."):
+    # one note: usually the ``with open(filename, "r") as f:`` pattern is preferred for filehandling! 
+    # this is becuase it auto-closes the file, here you are leaving them open since you are not calling Close
+    # see https://www.programiz.com/python-programming/file-operation
     f_es = open( os.path.join( calling_dir, "es-en/europarl-v7.es-en.es") , "r")
     f_en = open( os.path.join( calling_dir, "es-en/europarl-v7.es-en.en") , "r")
 
-    maximum_iter = 100
-    i = 1
     deepl_blues = []
     argostranslate_blues = []
 
-    while i <= maximum_iter:    
+    for _ in range(N_LINES_TO_TRANSLATE): # the _ indicates that variable is not used
         spanish_sentence = f_es.readline()
         english_reference = [f_en.readline()]
         deepl_translation = translate_to_english_using_deepl(spanish_sentence, api_key)
         argostranslate_translation = translate_to_english_using_argostranslate(spanish_sentence)
         deepl_blues.append( sentence_bleu(english_reference, deepl_translation) )
         argostranslate_blues.append( sentence_bleu(english_reference, argostranslate_translation) )    
-        i += 1
 
-    print("DEEPL_TRANSLATOR: {s}".format(s=sum(deepl_blues)/len(deepl_blues)))
+    print("DEEPL_TRANSLATOR: {s}".format(s=sum(deepl_blues)/len(deepl_blues))) 
+    # one tiny nit, if someone passes an empty file this will fail with a divide by zero error. so you could assert beforehand that these are not len 0 
     print("ARGOSTRANSLATE_TRANSLATOR: {s}".format(s=sum(argostranslate_blues)/len(argostranslate_blues)))
 
 if __name__ == "__main__":
