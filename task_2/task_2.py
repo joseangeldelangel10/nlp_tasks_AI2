@@ -118,7 +118,7 @@ class NERDataMaker:
             for subword in subwords_after_tokenizing:            
               #special cases:              
               if subword is None or subword == "[CLS]" or subword == "[SEP]":
-                labels.append(-100)
+                labels.append(-100) # add a note that this is a special token for the trainer, not a random -100
               else:
                 if word_index < len(original_words_list):
                   rebuilt_string += self.remove_starting_hastags(subword)
@@ -214,14 +214,14 @@ def task_2(n_samples, epochs, calling_dir = "."):
     training_arguments = TrainingArguments(output_dir = os.path.join( calling_dir, "NER_models") ,
                                         evaluation_strategy="epoch",
                                         logging_strategy="epoch",
-                                        learning_rate=2e-5,
+                                        learning_rate=2e-5, # nit: i might define these as constant and move to top
                                         per_device_train_batch_size=16,
                                         per_device_eval_batch_size=16,                                      
                                         num_train_epochs=epochs,
                                         weight_decay=0.01)
     metric = evaluate.load("accuracy")
 
-    def compute_metrics(eval_pred):
+    def compute_metrics(eval_pred): # so this nesting stuff is where classes can be really helpful! instead of nesting a function inside a function, define a class and have all these functions be methods on that class. it's way easier to read that way, and easier to test individual functions! 
         logits, labels = eval_pred
         predictions = np.argmax(logits, axis=-1)    
         predictions = predictions.astype('int32')
@@ -258,6 +258,6 @@ def task_2(n_samples, epochs, calling_dir = "."):
     plt.show()    
 
 if __name__ == "__main__":
-    N_EXAMPLES_TO_TRAIN = 100
+    N_EXAMPLES_TO_TRAIN = 100 # Nit: move to top https://peps.python.org/pep-0008/#constants
     epochs = 20
     task_2(n_samples = N_EXAMPLES_TO_TRAIN, epochs=epochs)
