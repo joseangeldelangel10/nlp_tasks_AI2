@@ -18,14 +18,13 @@ def task_1(calling_dir = "."):
     negative_reviews_count = 0
     for review in movie_reviews_file:
         inputs = tokenizer(review, return_tensors="pt")
+        # NIT: I would pull the rest of this out into a separate named function that takes review as an arg and returns negative_reviews_count, positive_reviews_count
         # Model output values are given in the format ([[[negative_review_probability, positive_review_probability]]])
-        # here we extract the probabilities of each sentiment and print "POSSITIVE" or "NEGATIVE"  
+        # here we extract the probabilities of each sentiment and print "POSITIVE" or "NEGATIVE"  
         # based on the biggest probability 
-        outputs = model(**inputs)
-        redable_outputs = outputs.to_tuple()
-        redable_outputs = redable_outputs[0]
-        negative_prob = redable_outputs[0][0].item()
-        positive_prob = redable_outputs[0][1].item()
+        readable_outputs = model(**inputs).to_tuple()[0]
+        negative_prob = readable_outputs[0][0].item()
+        positive_prob = readable_outputs[0][1].item()
         review_sentiment = "POSITIVE" if (positive_prob>=negative_prob) else "NEGATIVE"
         print( review_sentiment )
         if review_sentiment == "POSITIVE":
