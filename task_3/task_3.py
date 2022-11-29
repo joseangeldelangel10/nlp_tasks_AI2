@@ -16,6 +16,8 @@ import json
 from nltk.translate.bleu_score import sentence_bleu
 import os
 
+N_LINES_TO_TRANSLATE = 10
+
 def translate_to_english_using_deepl(string, api_key):
     domain_1 = 'https://api-free.deepl.com/v2/translate'
     headers_1 = {'Authorization': 'DeepL-Auth-Key {k}'.format(k=api_key)}
@@ -33,25 +35,29 @@ def translate_to_english_using_argostranslate(string):
     return translation_2
 
 def task_3(api_key, calling_dir = "."):
+    global N_LINES_TO_TRANSLATE
     f_es = open( os.path.join( calling_dir, "es-en/europarl-v7.es-en.es") , "r")
     f_en = open( os.path.join( calling_dir, "es-en/europarl-v7.es-en.en") , "r")
-
-    maximum_iter = 100
-    i = 1
+    
     deepl_blues = []
     argostranslate_blues = []
 
-    while i <= maximum_iter:    
+    for _ in range(N_LINES_TO_TRANSLATE):    
         spanish_sentence = f_es.readline()
         english_reference = [f_en.readline()]
         deepl_translation = translate_to_english_using_deepl(spanish_sentence, api_key)
         argostranslate_translation = translate_to_english_using_argostranslate(spanish_sentence)
         deepl_blues.append( sentence_bleu(english_reference, deepl_translation) )
-        argostranslate_blues.append( sentence_bleu(english_reference, argostranslate_translation) )    
-        i += 1
+        argostranslate_blues.append( sentence_bleu(english_reference, argostranslate_translation) )            
 
-    print("DEEPL_TRANSLATOR: {s}".format(s=sum(deepl_blues)/len(deepl_blues)))
-    print("ARGOSTRANSLATE_TRANSLATOR: {s}".format(s=sum(argostranslate_blues)/len(argostranslate_blues)))
+    f_es.close()
+    f_en.close()
+
+    if len(deepl_blues) > 0 and len(argostranslate_blues) > 0:
+        print("DEEPL_TRANSLATOR: {s}".format(s=sum(deepl_blues)/len(deepl_blues)))
+        print("ARGOSTRANSLATE_TRANSLATOR: {s}".format(s=sum(argostranslate_blues)/len(argostranslate_blues)))
+    else:
+        print("No lines given for translation, please check if the value of N_LINES_TO_TRANSLATE is correct")
 
 if __name__ == "__main__":
     from api_keys import DEEPL_KEY

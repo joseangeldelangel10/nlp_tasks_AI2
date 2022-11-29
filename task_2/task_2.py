@@ -20,6 +20,10 @@ import copy
 import matplotlib.pyplot as plt
 import os
 
+N_EXAMPLES_TO_TRAIN = 50
+N_TRAINING_EPOCHS = 20
+TRAINING_LEARNING_RATE = 2e-5
+
 class NERDataMaker:
     """
     class that is initialized with a list containing lists of tuples, 
@@ -106,6 +110,17 @@ class NERDataMaker:
 
     def as_hf_dataset(self, tokenizer):
         def tokenize_and_align_labels(examples):
+            '''
+            This funtion takes a list of word-NER_tag pairs, tokenizes the words and assigns the label of the
+            word with the starting token (substring) of the word, the rest of the tokens (substrings) within the
+            word will have a value of -100 assigned, which refers to a that a huggingface model should ignore.
+            
+            See the following example for more details.
+
+            example input: [( '@sammuelLJackson', PER)]
+            example output: [ ('@',PER), ('sam', -100), ('uel', -100), (L, -100), ('Jackson', -100) ]
+
+            '''
             original_words_list = examples["tokens"]
             labels_for_original_words_list = examples["ner_tags"]
             tokenized_inputs = tokenizer(original_words_list, truncation=True, is_split_into_words=True, padding = True)
@@ -179,10 +194,13 @@ def create_tweets_with_entities_list(train_df):
         annotated_tweets.append( copy.deepcopy(annotated_tweet) )
     return annotated_tweets
 
-def task_2(n_samples, epochs, calling_dir = "."):
+def task_2(calling_dir = "."):
     '''
     Main function for the task
     '''    
+    global N_EXAMPLES_TO_TRAIN
+    global N_TRAINING_EPOCHS
+    global TRAINING_LEARNING_RATE
     # we read the dataset
     data_df = pd.read_excel( os.path.join(calling_dir, "twitter_dataset_train.xlsx") )
 
@@ -191,9 +209,9 @@ def task_2(n_samples, epochs, calling_dir = "."):
 
     # we make the train validation split
     num_entries = len(tweets_with_entities)
-    tweets_with_entities = tweets_with_entities[:n_samples%num_entries]        
-    train_tweets_with_entities = tweets_with_entities[:int(n_samples*0.8)]
-    eval_tweets_with_entities = tweets_with_entities[int(n_samples*0.8):]
+    tweets_with_entities = tweets_with_entities[:N_EXAMPLES_TO_TRAIN%num_entries]        
+    train_tweets_with_entities = tweets_with_entities[:int(N_EXAMPLES_TO_TRAIN*0.8)]
+    eval_tweets_with_entities = tweets_with_entities[int(N_EXAMPLES_TO_TRAIN*0.8):]
 
     # we transform the datset to a huggingface Dataset  
     training_data = NERDataMaker( train_tweets_with_entities )
@@ -214,10 +232,10 @@ def task_2(n_samples, epochs, calling_dir = "."):
     training_arguments = TrainingArguments(output_dir = os.path.join( calling_dir, "NER_models") ,
                                         evaluation_strategy="epoch",
                                         logging_strategy="epoch",
-                                        learning_rate=2e-5,
+                                        learning_rate=TRAINING_LEARNING_RATE,
                                         per_device_train_batch_size=16,
                                         per_device_eval_batch_size=16,                                      
-                                        num_train_epochs=epochs,
+                                        num_train_epochs=N_TRAINING_EPOCHS,
                                         weight_decay=0.01)
     metric = evaluate.load("accuracy")
 
@@ -257,7 +275,5 @@ def task_2(n_samples, epochs, calling_dir = "."):
     plt.legend(loc='best')
     plt.show()    
 
-if __name__ == "__main__":
-    N_EXAMPLES_TO_TRAIN = 100
-    epochs = 20
-    task_2(n_samples = N_EXAMPLES_TO_TRAIN, epochs=epochs)
+if __name__ == "__main__":    
+    task_2()

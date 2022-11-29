@@ -1,4 +1,4 @@
-from task_1.task_1 import task_1 as t1
+import task_1.task_1 as t1
 import task_2.task_2 as t2
 import task_3.task_3 as t3
 from task_2.task_2 import NERDataMaker
@@ -8,10 +8,19 @@ from datasets import Dataset
 from transformers import BertTokenizer
 import os
 
+def test_task_1_classify_movie_review_sentiment():
+    t1.load_hugging_face_model("JamesH/autotrain-third-project-1883864250")
+    test_movie_review_1 = "once again the director delivered an awfull pice, completly messy and absolutetly nonsense"
+    test_movie_review_2 = "one of the best movies I've ever seen, a delightfull film"
+    sentiment_on_review_1 = t1.classify_movie_review_sentiment(test_movie_review_1)
+    sentiment_on_review_2 = t1.classify_movie_review_sentiment(test_movie_review_2)
+    assert sentiment_on_review_1 == "NEGATIVE"
+    assert sentiment_on_review_2 == "POSITIVE"
+
 def test_task_1_main_function():
     current_dir = os.getcwd()
     task_1_script_dir = os.path.join(current_dir, "task_1")
-    task_1_results = t1(calling_dir=task_1_script_dir) # testing that no exceptions occur when running test 1
+    task_1_results = t1.task_1(calling_dir=task_1_script_dir) # testing that no exceptions occur when running test 1
     assert task_1_results[0] > 0, "error in test no negative reviws where found, please check model performance"
     assert task_1_results[1] > 0, "error in test no positive reviws where found, please check model performance"
 
