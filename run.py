@@ -4,9 +4,6 @@ This script calls three other scripts to:
 2 - Retrain a NER model using tagged tweets
 3 - Evaluate the perfomance of two translation APIs
 '''
-#from task_1.task_1 import task_1 as t1
-#from task_2.task_2 import task_2 as t2
-#from task_3.task_3 import task_3 as t3
 import task_1.task_1 as t1
 import task_2.task_2 as t2
 import task_3.task_3 as t3
@@ -25,13 +22,13 @@ if __name__ == "__main__":
     print(" ==================================================== ")
     print("                    EXCECUTING TASK 2                 ")
     print(" ==================================================== ")    
-    t2.N_EXAMPLES_TO_TRAIN = 50    
-    t2.N_TRAINING_EPOCHS = 10
+    t2.N_EXAMPLES_TO_TRAIN = 100    
+    t2.N_TRAINING_EPOCHS = 20
     task_2_script_dir = os.path.join(current_dir, "task_2")
     t2.task_2(calling_dir = task_2_script_dir)
     print(" ==================================================== ")
     print("                    EXCECUTING TASK 3                 ")
     print(" ==================================================== ")    
     task_3_script_dir = os.path.join(current_dir, "task_3")
-    t3.N_LINES_TO_TRANSLATE = 10
+    t3.N_LINES_TO_TRANSLATE = 100
     t3.task_3(api_key=DEEPL_KEY, calling_dir = task_3_script_dir)
